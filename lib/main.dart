@@ -4,23 +4,23 @@ import 'package:habit_tracker/core/router/app_router.dart';
 import 'package:habit_tracker/core/themes/theme.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(MainApp());
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  MainApp({super.key});
+  final _appRouter = AppRouter();
 
   @override
   Widget build(BuildContext context) {
-    final appRouter = AppRouter();
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Habit Tracker',
       themeMode: ThemeMode.light,
       darkTheme: AppTheme.darkTheme,
       theme: AppTheme.lightTheme,
-      routerDelegate: AutoRouterDelegate(appRouter),
-      routeInformationParser: appRouter.defaultRouteParser(),
+      routerDelegate: AutoRouterDelegate(_appRouter),
+      routeInformationParser: _appRouter.defaultRouteParser(),
     );
   }
 }
