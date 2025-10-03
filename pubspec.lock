@@ -284,13 +284,13 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_riverpod:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: flutter_riverpod
-      sha256: ca2480512a8e840291325249f4857e363ffa5d1b77b132e189c9313a9d9fb9e0
+      sha256: "71a420767ae786f9402e4efb74e1119fa95b53e6a3781ab8ab21c121ac1349c6"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0"
+    version: "3.0.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -324,10 +324,10 @@ packages:
     dependency: "direct main"
     description:
       name: hooks_riverpod
-      sha256: ef5b42bc912994283da7cc34cae2ec64842e3fbd7722525f749f07688f4ec7b6
+      sha256: a43340c5a3fd9d0494b584c5e3fef9cc50496e28a8f5fd30193beb7984db52fb
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0"
+    version: "3.0.1"
   hotreloader:
     dependency: transitive
     description:
@@ -360,6 +360,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+  implicitly_animated_list:
+    dependency: "direct main"
+    description:
+      name: implicitly_animated_list
+      sha256: "0912337ba058609ad8b4db8c1886959a4f82e03ee197ecdacbd8bf906bf1e195"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.0"
   intl:
     dependency: transitive
     description:
@@ -432,6 +440,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.1.1"
+  list_diff:
+    dependency: transitive
+    description:
+      name: list_diff
+      sha256: ac2d99c4379d5175f1e4943850808e1bf4d5604fd46c1ec3060e7fb0c0fdab05
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   logging:
     dependency: transitive
     description:
@@ -524,10 +540,10 @@ packages:
     dependency: transitive
     description:
       name: riverpod
-      sha256: "135723ec44dfba141bc4696224048a408336e794228a0117439e7ad0a8be6d05"
+      sha256: b21446f04474040479b19004c5b729605cde221bbd14cf16ad0db8804dce4810
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0"
+    version: "3.0.1"
   shelf:
     dependency: transitive
     description:

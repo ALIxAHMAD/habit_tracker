@@ -1,0 +1,229 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:implicitly_animated_list/implicitly_animated_list.dart';
+
+import 'package:habit_tracker/features/habitTracker/presentation/providers/home/mock_data.dart';
+import 'package:habit_tracker/features/habitTracker/presentation/providers/home/task_provider.dart';
+
+class DailySummaryCard extends ConsumerWidget {
+  const DailySummaryCard({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tasks = ref.watch(taskProvider);
+    final completedTasksCount = tasks.where((t) => t.isDone).length;
+    final totalTasksCount = tasks.length;
+    final colorScheme = ColorScheme.of(context);
+    final date = "15/7/2025";
+
+    return Card(
+      elevation: 8,
+      shadowColor: colorScheme.secondary,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: LinearGradient(
+            colors: [colorScheme.primary, colorScheme.secondary],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              Header(date: date),
+              SizedBox(height: 16),
+              ProgressIndicator(
+                completedTasksCount: completedTasksCount,
+                totalTasksCount: totalTasksCount,
+              ),
+              SizedBox(height: 16),
+              CompletedTasksList(
+                completedTasks: tasks.where((t) => t.isDone).toList(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ProgressIndicator extends HookConsumerWidget {
+  const ProgressIndicator({
+    super.key,
+    required this.completedTasksCount,
+    required this.totalTasksCount,
+  });
+  final int completedTasksCount;
+  final int totalTasksCount;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = ColorScheme.of(context);
+    final newValue = completedTasksCount / totalTasksCount;
+    final preValue = useRef(newValue);
+    return Column(
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.list_sharp,
+              color: colorScheme.onPrimary,
+              size: 20,
+            ),
+            SizedBox(width: 4),
+            Text(
+              "$completedTasksCount/$totalTasksCount",
+              style: TextStyle(color: colorScheme.onPrimary),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 6,
+        ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: TweenAnimationBuilder<double>(
+            tween: Tween<double>(
+              begin: preValue.value,
+              end: newValue,
+            ),
+            duration: Duration(milliseconds: 220),
+            builder: (context, value, _) => LinearProgressIndicator(
+              value: value,
+              color: colorScheme.onPrimary,
+              minHeight: 8,
+              backgroundColor: colorScheme.onPrimaryContainer,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class Header extends StatelessWidget {
+  const Header({
+    super.key,
+    required this.date,
+  });
+
+  final String date;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = ColorScheme.of(context);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          "Daily Summary",
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: colorScheme.onPrimary,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        Text(
+          date,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: colorScheme.onPrimary,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class CompletedTasksList extends StatelessWidget {
+  const CompletedTasksList({
+    super.key,
+    required this.completedTasks,
+  });
+
+  final List<Task> completedTasks;
+
+  @override
+  Widget build(BuildContext context) {
+    return ImplicitlyAnimatedList<Task>(
+      shrinkWrap: true,
+      itemData: completedTasks,
+      deleteDuration: Duration(milliseconds: 220),
+      insertDuration: Duration(milliseconds: 220),
+      itemEquality: (a, b) => a.id == b.id,
+      itemBuilder: (context, task) {
+        return DoneListTile(task: task);
+      },
+      insertAnimation: (context, child, animation) {
+        return SizeTransition(
+          sizeFactor: animation,
+          child: child,
+        );
+      },
+      deleteAnimation: (context, child, animation) {
+        return SizeTransition(
+          sizeFactor: animation,
+          child: child,
+        );
+      },
+    );
+  }
+}
+
+class DoneListTile extends HookConsumerWidget {
+  const DoneListTile({
+    super.key,
+
+    required this.task,
+  });
+
+  final Task task;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = ColorScheme.of(context);
+
+    return InkWell(
+      onTap: () => ref.read(taskProvider.notifier).toggleTask(task),
+      child: Row(
+        children: [
+          Transform.scale(
+            scale: 0.8,
+            child: Checkbox(
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              visualDensity: VisualDensity.compact,
+              activeColor: colorScheme.onPrimary,
+              checkColor: colorScheme.primary,
+              side: BorderSide(
+                color: colorScheme.onPrimary,
+                width: 2,
+              ),
+              tristate: true,
+              value: task.isDone,
+              onChanged: (bool? newValue) {
+                ref.read(taskProvider.notifier).toggleTask(task);
+              },
+            ),
+          ),
+          Expanded(
+            child: Text(
+              task.title,
+              overflow: TextOverflow.fade,
+              style: TextStyle(
+                color: colorScheme.onPrimary,
+                fontSize: 16,
+              ),
+              maxLines: 1,
+              softWrap: false,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

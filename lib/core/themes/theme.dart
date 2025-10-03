@@ -6,14 +6,14 @@ class AppTheme {
     surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
     blendLevel: 15,
     appBarStyle: FlexAppBarStyle.scaffoldBackground,
-    scheme: FlexScheme.indigoM3,
+    scheme: FlexScheme.aquaBlue,
     useMaterial3: true,
   ).toTheme;
   static ThemeData darkTheme = FlexColorScheme.dark(
     surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
     blendLevel: 15,
     appBarStyle: FlexAppBarStyle.scaffoldBackground,
-    scheme: FlexScheme.indigoM3,
+    scheme: FlexScheme.aquaBlue,
     useMaterial3: true,
   ).toTheme;
 }
