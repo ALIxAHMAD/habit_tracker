@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:habit_tracker/features/habitTracker/presentation/providers/home/task_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class TimeLineView extends HookConsumerWidget {
@@ -11,14 +11,17 @@ class TimeLineView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedDate = useState(DateTime.now());
+    final currentDate = ref.watch(
+      taskProvider.select((state) => state.currentDate),
+    );
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: EasyDateTimeLine(
-        initialDate: selectedDate.value,
-        onDateChange: (date) => selectedDate.value = date,
+        initialDate: currentDate,
+        onDateChange: (date) =>
+            ref.read(taskProvider.notifier).changeDate(date),
         headerProps: const EasyHeaderProps(showHeader: false),
         dayProps: _buildDayProps(colorScheme),
       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/features/habitTracker/domain/entities/task.dart';
 import 'package:habit_tracker/features/habitTracker/presentation/pages/home/components/delete_habit_dialog.dart';
-import 'package:habit_tracker/features/habitTracker/presentation/providers/home/mock_data.dart';
 import 'package:habit_tracker/features/habitTracker/presentation/providers/home/task_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:implicitly_animated_list/implicitly_animated_list.dart';
@@ -10,7 +10,7 @@ class TodoList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final todoTasks = ref.watch(taskProvider).where((t) => !t.isDone).toList();
+    final todoTasks = ref.watch(taskProvider.select((state) => state.todo));
 
     return ImplicitlyAnimatedList<Task>(
       shrinkWrap: true,
@@ -47,6 +47,7 @@ class TodoListTile extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final provider = ref.watch(taskProvider.notifier);
     final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 2.0),
@@ -57,8 +58,10 @@ class TodoListTile extends HookConsumerWidget {
         ),
         elevation: 6,
         child: InkWell(
-          onLongPress: () => showDeleteHabitDialog(context, () {}, task.title),
-          onTap: () => ref.read(taskProvider.notifier).toggleTask(task),
+          onLongPress: () => showDeleteHabitDialog(context, () {
+            provider.deleteHabit(task.id);
+          }, task.title),
+          onTap: () => ref.read(taskProvider.notifier).toggleTask(task.id),
           borderRadius: BorderRadius.circular(12),
           child: Ink(
             decoration: BoxDecoration(
@@ -93,7 +96,7 @@ class TodoListTile extends HookConsumerWidget {
                     tristate: true,
                     value: task.isDone,
                     onChanged: (_) {
-                      ref.read(taskProvider.notifier).toggleTask(task);
+                      ref.read(taskProvider.notifier).toggleTask(task.id);
                     },
                   ),
                 ),

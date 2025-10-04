@@ -1,25 +1,93 @@
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:habit_tracker/features/habitTracker/presentation/providers/home/mock_data.dart';
+import 'package:habit_tracker/features/habitTracker/domain/entities/task.dart';
+import 'package:habit_tracker/features/habitTracker/domain/repositories/repository.dart';
+import 'package:habit_tracker/features/habitTracker/domain/usecases/add_habit.dart';
+import 'package:habit_tracker/features/habitTracker/domain/usecases/delete_habit.dart';
+import 'package:habit_tracker/features/habitTracker/domain/usecases/get_tasks.dart';
+import 'package:habit_tracker/features/habitTracker/domain/usecases/toggle_task.dart';
+import 'package:habit_tracker/features/habitTracker/presentation/providers/home/task_state.dart';
 
-class TaskNotifier extends StateNotifier<List<Task>> {
-  TaskNotifier()
-    : super([
-        Task(id: "1", title: "Go to gym", isDone: false),
-        Task(id: "2", title: "Read 20 pages", isDone: false),
-        Task(id: "3", title: "Meditate", isDone: false),
-      ]);
+class TaskNotifier extends StateNotifier<TaskState> {
+  final AddHabitUseCase _addHabitUseCase;
+  final DeleteHabitUseCase _deleteHabitUseCase;
+  final GetTasksUseCase _getTasksUseCase;
+  final ToggleTaskUseCase _toggleTaskUseCase;
+  TaskNotifier({required HabitRepository repository})
+    : _addHabitUseCase = AddHabitUseCase(repository),
+      _deleteHabitUseCase = DeleteHabitUseCase(repository),
+      _getTasksUseCase = GetTasksUseCase(repository),
+      _toggleTaskUseCase = ToggleTaskUseCase(repository),
+      super(TaskState.initial());
 
-  void toggleTask(Task task) {
-    state = [
-      for (final t in state)
-        if (t.id == task.id) t.copyWith(isDone: !t.isDone) else t,
-    ];
+  Future<void> toggleTask(String id) async {
+    final result = await _toggleTaskUseCase(id);
+    result.fold(
+      (l) {
+        state = state.copyWith(errorMessage: l.message);
+      },
+      (r) {
+        state = state.copyWith(
+          tasks: TasksList([
+            for (final t in state.tasks.tasks)
+              if (t.id == id) t.copyWith(isDone: !t.isDone) else t,
+          ]),
+        );
+      },
+    );
   }
 
-  List<Task> get done => state.where((t) => t.isDone).toList();
-  List<Task> get todo => state.where((t) => !t.isDone).toList();
+  Future<void> deleteHabit(String id) async {
+    final result = await _deleteHabitUseCase(id);
+    result.fold(
+      (l) {
+        state = state.copyWith(errorMessage: l.message);
+      },
+      (r) {
+        state = state.copyWith(
+          tasks: TasksList([
+            for (final t in state.tasks.tasks)
+              if (t.id != id) t,
+          ]),
+        );
+      },
+    );
+  }
+
+  Future<void> changeDate(DateTime newDate) async {
+    state = state.copyWith(currentDate: newDate);
+    await fetchTasksForCurrentDay();
+  }
+
+  Future<void> fetchTasksForCurrentDay() async {
+    final result = await _getTasksUseCase(state.currentDate);
+    result.fold(
+      (l) {
+        state = state.copyWith(errorMessage: l.message);
+      },
+      (r) {
+        state = state.copyWith(tasks: r);
+      },
+    );
+  }
+
+  Future<void> addHabit(String title) async {
+    final result = await _addHabitUseCase(title);
+    result.fold(
+      (l) {
+        state = state.copyWith(errorMessage: l.message);
+      },
+      (r) {
+        state = state.copyWith(
+          tasks: TasksList([
+            ...state.tasks.tasks,
+            Task(id: r, title: title, isDone: false),
+          ]),
+        );
+      },
+    );
+  }
 }
 
-final taskProvider = StateNotifierProvider<TaskNotifier, List<Task>>(
-  (ref) => TaskNotifier(),
+final taskProvider = StateNotifierProvider<TaskNotifier, TaskState>(
+  (ref) => throw Exception("Unimplemented"),
 );

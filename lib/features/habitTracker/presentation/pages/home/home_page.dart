@@ -1,17 +1,47 @@
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:habit_tracker/features/habitTracker/presentation/pages/home/components/add_habit_dialog.dart';
 import 'package:habit_tracker/features/habitTracker/presentation/pages/home/components/daily_summary_card.dart';
 import 'package:habit_tracker/features/habitTracker/presentation/pages/home/components/time_line_view.dart';
 import 'package:habit_tracker/features/habitTracker/presentation/pages/home/components/todo_list.dart';
+import 'package:habit_tracker/features/habitTracker/presentation/providers/home/task_provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 @RoutePage()
-class HomePage extends StatelessWidget {
+class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = ref.read(taskProvider.notifier);
+    final state = ref.watch(taskProvider);
     final colorScheme = ColorScheme.of(context);
+
+    useEffect(() {
+      provider.fetchTasksForCurrentDay();
+      return null;
+    }, const []);
+
+    useEffect(() {
+      if (state.errorMessage.isNotEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: colorScheme.error,
+              content: Text(
+                state.errorMessage,
+                style: TextStyle(
+                  color: colorScheme.onError,
+                ),
+              ),
+            ),
+          );
+        });
+      }
+      return null;
+    }, [state.errorMessage]);
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -22,7 +52,9 @@ class HomePage extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(25),
           onTap: () {
-            showAddHabitDialog(context, (title) {});
+            showAddHabitDialog(context, (title) {
+              provider.addHabit(title);
+            });
           },
           child: Ink(
             padding: const EdgeInsets.all(14.0),

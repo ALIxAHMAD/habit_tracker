@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:habit_tracker/features/habitTracker/domain/entities/task.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:implicitly_animated_list/implicitly_animated_list.dart';
 
-import 'package:habit_tracker/features/habitTracker/presentation/providers/home/mock_data.dart';
 import 'package:habit_tracker/features/habitTracker/presentation/providers/home/task_provider.dart';
 
 class DailySummaryCard extends ConsumerWidget {
@@ -11,11 +11,11 @@ class DailySummaryCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tasks = ref.watch(taskProvider);
-    final completedTasksCount = tasks.where((t) => t.isDone).length;
-    final totalTasksCount = tasks.length;
+    final state = ref.watch(taskProvider);
+    final completedTasksCount = state.done.length;
+    final totalTasksCount = state.tasks.tasks.length;
     final colorScheme = ColorScheme.of(context);
-    final date = "15/7/2025";
+    final date = state.currentDate;
 
     return Card(
       elevation: 8,
@@ -34,7 +34,10 @@ class DailySummaryCard extends ConsumerWidget {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-              Header(date: date),
+              Header(
+                key: ValueKey(date),
+                date: "${date.day}/${date.month}/${date.year}",
+              ),
               SizedBox(height: 16),
               ProgressIndicator(
                 completedTasksCount: completedTasksCount,
@@ -42,7 +45,7 @@ class DailySummaryCard extends ConsumerWidget {
               ),
               SizedBox(height: 16),
               CompletedTasksList(
-                completedTasks: tasks.where((t) => t.isDone).toList(),
+                completedTasks: state.done,
               ),
             ],
           ),
@@ -128,11 +131,27 @@ class Header extends StatelessWidget {
             fontSize: 20,
           ),
         ),
-        Text(
-          date,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onPrimary,
+        AnimatedSwitcher(
+          duration: Duration(milliseconds: 300),
+          transitionBuilder: (child, animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, -1),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              ),
+            );
+          },
+          child: Text(
+            key: ValueKey(date),
+            date,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: colorScheme.onPrimary,
+            ),
           ),
         ),
       ],
@@ -189,7 +208,7 @@ class DoneListTile extends HookConsumerWidget {
     final colorScheme = ColorScheme.of(context);
 
     return InkWell(
-      onTap: () => ref.read(taskProvider.notifier).toggleTask(task),
+      onTap: () => ref.read(taskProvider.notifier).toggleTask(task.id),
       child: Row(
         children: [
           Transform.scale(
@@ -206,7 +225,7 @@ class DoneListTile extends HookConsumerWidget {
               tristate: true,
               value: task.isDone,
               onChanged: (bool? newValue) {
-                ref.read(taskProvider.notifier).toggleTask(task);
+                ref.read(taskProvider.notifier).toggleTask(task.id);
               },
             ),
           ),
