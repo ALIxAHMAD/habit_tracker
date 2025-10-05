@@ -1,9 +1,11 @@
-class Task {
+import 'package:equatable/equatable.dart';
+
+class Task extends Equatable {
   final String id;
   final String title;
   final bool isDone;
 
-  Task({
+  const Task({
     required this.id,
     required this.title,
     required this.isDone,
@@ -20,10 +22,17 @@ class Task {
       isDone: isDone ?? this.isDone,
     );
   }
+
+  @override
+  List<Object?> get props => [id, title, isDone];
 }
 
-class TasksList {
+class TasksList extends Equatable {
   final List<Task> tasks;
+  const TasksList({
+    required this.tasks,
+  });
 
-  TasksList(this.tasks);
+  @override
+  List<Object?> get props => [tasks];
 }

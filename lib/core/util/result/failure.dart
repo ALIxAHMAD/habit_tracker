@@ -8,3 +8,7 @@ abstract class Failure extends Equatable {
   @override
   List<Object> get props => [message];
 }
+
+class LocalDataSourceFailure extends Failure {
+  const LocalDataSourceFailure(super.message);
+}

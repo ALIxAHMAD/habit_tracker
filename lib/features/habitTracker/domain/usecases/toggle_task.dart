@@ -8,7 +8,7 @@ class ToggleTaskUseCase {
 
   ToggleTaskUseCase(this.repository);
 
-  Future<Either<Failure, Success>> call(String id) {
-    return repository.toggleTask(id);
+  Future<Either<Failure, Success>> call(String id, DateTime date) {
+    return repository.toggleTask(id, date);
   }
 }

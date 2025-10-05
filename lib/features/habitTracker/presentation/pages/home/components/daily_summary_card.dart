@@ -15,7 +15,6 @@ class DailySummaryCard extends ConsumerWidget {
     final completedTasksCount = state.done.length;
     final totalTasksCount = state.tasks.tasks.length;
     final colorScheme = ColorScheme.of(context);
-    final date = state.currentDate;
 
     return Card(
       elevation: 8,
@@ -34,10 +33,7 @@ class DailySummaryCard extends ConsumerWidget {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-              Header(
-                key: ValueKey(date),
-                date: "${date.day}/${date.month}/${date.year}",
-              ),
+              Header(),
               SizedBox(height: 16),
               ProgressIndicator(
                 completedTasksCount: completedTasksCount,
@@ -67,7 +63,9 @@ class ProgressIndicator extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = ColorScheme.of(context);
-    final newValue = completedTasksCount / totalTasksCount;
+    final newValue = totalTasksCount > 0
+        ? completedTasksCount / totalTasksCount
+        : 0.0;
     final preValue = useRef(newValue);
     return Column(
       children: [
@@ -109,17 +107,15 @@ class ProgressIndicator extends HookConsumerWidget {
   }
 }
 
-class Header extends StatelessWidget {
+class Header extends HookConsumerWidget {
   const Header({
     super.key,
-    required this.date,
   });
 
-  final String date;
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = ColorScheme.of(context);
+    final date = ref.watch(taskProvider.select((state) => state.currentDate));
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -132,13 +128,13 @@ class Header extends StatelessWidget {
           ),
         ),
         AnimatedSwitcher(
-          duration: Duration(milliseconds: 300),
+          duration: Duration(milliseconds: 450),
           transitionBuilder: (child, animation) {
             return FadeTransition(
               opacity: animation,
               child: SlideTransition(
                 position: Tween<Offset>(
-                  begin: const Offset(0, -1),
+                  begin: const Offset(0, -1.5),
                   end: Offset.zero,
                 ).animate(animation),
                 child: child,
@@ -147,7 +143,7 @@ class Header extends StatelessWidget {
           },
           child: Text(
             key: ValueKey(date),
-            date,
+            "${date.day}/${date.month}/${date.year}",
             style: TextStyle(
               fontWeight: FontWeight.w600,
               color: colorScheme.onPrimary,

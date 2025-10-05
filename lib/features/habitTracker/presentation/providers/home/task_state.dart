@@ -28,7 +28,7 @@ class TaskState extends Equatable {
     return TaskState(
       currentDate: DateTime.now(),
       errorMessage: "",
-      tasks: TasksList([]),
+      tasks: TasksList(tasks: []),
     );
   }
 

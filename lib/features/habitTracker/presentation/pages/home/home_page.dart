@@ -28,6 +28,8 @@ class HomePage extends HookConsumerWidget {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
+              behavior: SnackBarBehavior.floating,
+              duration: Duration(seconds: 3),
               backgroundColor: colorScheme.error,
               content: Text(
                 state.errorMessage,
@@ -37,8 +39,10 @@ class HomePage extends HookConsumerWidget {
               ),
             ),
           );
+          provider.clearError();
         });
       }
+
       return null;
     }, [state.errorMessage]);
 

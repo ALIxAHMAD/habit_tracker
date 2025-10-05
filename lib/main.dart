@@ -21,7 +21,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Habit Tracker',
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.system,
       darkTheme: AppTheme.darkTheme,
       theme: AppTheme.lightTheme,
       routerDelegate: AutoRouterDelegate(_appRouter),

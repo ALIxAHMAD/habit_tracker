@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:habit_tracker/features/habitTracker/data/repositories/repo.dart';
 import 'package:habit_tracker/features/habitTracker/domain/entities/task.dart';
 import 'package:habit_tracker/features/habitTracker/domain/repositories/repository.dart';
 import 'package:habit_tracker/features/habitTracker/domain/usecases/add_habit.dart';
@@ -6,6 +7,12 @@ import 'package:habit_tracker/features/habitTracker/domain/usecases/delete_habit
 import 'package:habit_tracker/features/habitTracker/domain/usecases/get_tasks.dart';
 import 'package:habit_tracker/features/habitTracker/domain/usecases/toggle_task.dart';
 import 'package:habit_tracker/features/habitTracker/presentation/providers/home/task_state.dart';
+
+final taskProvider = StateNotifierProvider<TaskNotifier, TaskState>(
+  (ref) => TaskNotifier(
+    repository: ref.watch(habitRepositoryProvider),
+  ),
+);
 
 class TaskNotifier extends StateNotifier<TaskState> {
   final AddHabitUseCase _addHabitUseCase;
@@ -20,17 +27,19 @@ class TaskNotifier extends StateNotifier<TaskState> {
       super(TaskState.initial());
 
   Future<void> toggleTask(String id) async {
-    final result = await _toggleTaskUseCase(id);
+    final result = await _toggleTaskUseCase(id, state.currentDate);
     result.fold(
       (l) {
         state = state.copyWith(errorMessage: l.message);
       },
       (r) {
         state = state.copyWith(
-          tasks: TasksList([
-            for (final t in state.tasks.tasks)
-              if (t.id == id) t.copyWith(isDone: !t.isDone) else t,
-          ]),
+          tasks: TasksList(
+            tasks: [
+              for (final t in state.tasks.tasks)
+                if (t.id == id) t.copyWith(isDone: !t.isDone) else t,
+            ],
+          ),
         );
       },
     );
@@ -44,10 +53,12 @@ class TaskNotifier extends StateNotifier<TaskState> {
       },
       (r) {
         state = state.copyWith(
-          tasks: TasksList([
-            for (final t in state.tasks.tasks)
-              if (t.id != id) t,
-          ]),
+          tasks: TasksList(
+            tasks: [
+              for (final t in state.tasks.tasks)
+                if (t.id != id) t,
+            ],
+          ),
         );
       },
     );
@@ -78,16 +89,18 @@ class TaskNotifier extends StateNotifier<TaskState> {
       },
       (r) {
         state = state.copyWith(
-          tasks: TasksList([
-            ...state.tasks.tasks,
-            Task(id: r, title: title, isDone: false),
-          ]),
+          tasks: TasksList(
+            tasks: [
+              ...state.tasks.tasks,
+              Task(id: r, title: title, isDone: false),
+            ],
+          ),
         );
       },
     );
   }
-}
 
-final taskProvider = StateNotifierProvider<TaskNotifier, TaskState>(
-  (ref) => throw Exception("Unimplemented"),
-);
+  void clearError() async {
+    state = state.copyWith(errorMessage: "");
+  }
+}
