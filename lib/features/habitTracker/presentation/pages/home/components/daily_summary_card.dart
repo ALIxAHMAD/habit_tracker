@@ -1,5 +1,7 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:habit_tracker/core/router/app_router.gr.dart';
 import 'package:habit_tracker/features/habitTracker/domain/entities/task.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:implicitly_animated_list/implicitly_animated_list.dart';
@@ -204,6 +206,9 @@ class DoneListTile extends HookConsumerWidget {
     final colorScheme = ColorScheme.of(context);
 
     return InkWell(
+      onLongPress: () => AutoRouter.of(
+        context,
+      ).replaceAll([HabitRoute(habitId: task.id)]),
       onTap: () => ref.read(taskProvider.notifier).toggleTask(task.id),
       child: Row(
         children: [
@@ -226,15 +231,18 @@ class DoneListTile extends HookConsumerWidget {
             ),
           ),
           Expanded(
-            child: Text(
-              task.title,
-              overflow: TextOverflow.fade,
-              style: TextStyle(
-                color: colorScheme.onPrimary,
-                fontSize: 16,
+            child: Hero(
+              tag: "${task.id}${task.title}",
+              child: Text(
+                task.title,
+                overflow: TextOverflow.fade,
+                style: TextStyle(
+                  color: colorScheme.onPrimary,
+                  fontSize: 16,
+                ),
+                maxLines: 1,
+                softWrap: false,
               ),
-              maxLines: 1,
-              softWrap: false,
             ),
           ),
         ],

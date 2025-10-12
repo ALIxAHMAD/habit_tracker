@@ -1,6 +1,7 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/core/router/app_router.gr.dart';
 import 'package:habit_tracker/features/habitTracker/domain/entities/task.dart';
-import 'package:habit_tracker/features/habitTracker/presentation/pages/home/components/delete_habit_dialog.dart';
 import 'package:habit_tracker/features/habitTracker/presentation/providers/home/task_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:implicitly_animated_list/implicitly_animated_list.dart';
@@ -47,72 +48,75 @@ class TodoListTile extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(taskProvider.notifier);
     final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 2.0),
-      child: Card(
-        shadowColor: colorScheme.secondary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        elevation: 6,
-        child: InkWell(
-          onLongPress: () => showDeleteHabitDialog(context, () {
-            provider.deleteHabit(task.id);
-          }, task.title),
-          onTap: () => ref.read(taskProvider.notifier).toggleTask(task.id),
-          borderRadius: BorderRadius.circular(12),
-          child: Ink(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              gradient: LinearGradient(
-                colors: [colorScheme.primary, colorScheme.secondary],
-              ),
-              border: Border.symmetric(
-                horizontal: BorderSide(
-                  color: colorScheme.onPrimary,
-                  width: 2,
+      child: Hero(
+        tag: task.id,
+        child: Card(
+          shadowColor: colorScheme.secondary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 6,
+          child: InkWell(
+            onLongPress: () => AutoRouter.of(
+              context,
+            ).replaceAll([HabitRoute(habitId: task.id)]),
+
+            onTap: () => ref.read(taskProvider.notifier).toggleTask(task.id),
+            borderRadius: BorderRadius.circular(12),
+            child: Ink(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  colors: [colorScheme.primary, colorScheme.secondary],
                 ),
-                vertical: BorderSide(
-                  color: colorScheme.onPrimary,
-                  width: 2,
-                ),
-              ),
-            ),
-            child: Row(
-              children: [
-                Transform.scale(
-                  scale: 0.8,
-                  child: Checkbox(
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    visualDensity: VisualDensity.compact,
-                    activeColor: colorScheme.onPrimary,
-                    checkColor: colorScheme.primary,
-                    side: BorderSide(
-                      color: colorScheme.onPrimary,
-                      width: 2,
-                    ),
-                    tristate: true,
-                    value: task.isDone,
-                    onChanged: (_) {
-                      ref.read(taskProvider.notifier).toggleTask(task.id);
-                    },
+                border: Border.symmetric(
+                  horizontal: BorderSide(
+                    color: colorScheme.onPrimary,
+                    width: 2,
+                  ),
+                  vertical: BorderSide(
+                    color: colorScheme.onPrimary,
+                    width: 2,
                   ),
                 ),
-                Expanded(
-                  child: Text(
-                    task.title,
-                    overflow: TextOverflow.fade,
-                    style: TextStyle(
-                      color: colorScheme.onPrimary,
-                      fontSize: 16,
+              ),
+              child: Row(
+                children: [
+                  Transform.scale(
+                    scale: 0.8,
+                    child: Checkbox(
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                      activeColor: colorScheme.onPrimary,
+                      checkColor: colorScheme.primary,
+                      side: BorderSide(
+                        color: colorScheme.onPrimary,
+                        width: 2,
+                      ),
+                      tristate: true,
+                      value: task.isDone,
+                      onChanged: (_) {
+                        ref.read(taskProvider.notifier).toggleTask(task.id);
+                      },
                     ),
-                    maxLines: 1,
-                    softWrap: false,
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: Text(
+                      task.title,
+                      overflow: TextOverflow.fade,
+                      style: TextStyle(
+                        color: colorScheme.onPrimary,
+                        fontSize: 16,
+                      ),
+                      maxLines: 1,
+                      softWrap: false,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

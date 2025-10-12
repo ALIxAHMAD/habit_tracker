@@ -4,7 +4,9 @@ import 'package:habit_tracker/core/util/result/failure.dart';
 import 'package:habit_tracker/core/util/result/success.dart';
 import 'package:habit_tracker/features/habitTracker/data/datasources/data_source.dart';
 import 'package:habit_tracker/features/habitTracker/data/datasources/drift/drift_data_source.dart';
+import 'package:habit_tracker/features/habitTracker/domain/entities/habit.dart';
 import 'package:habit_tracker/features/habitTracker/domain/entities/task.dart';
+import 'package:habit_tracker/features/habitTracker/domain/entities/task_month_summary.dart';
 import 'package:habit_tracker/features/habitTracker/domain/repositories/repository.dart';
 
 final habitRepositoryProvider = Provider<HabitRepository>(
@@ -51,6 +53,39 @@ class HabitRepositoryImplementation implements HabitRepository {
   Future<Either<Failure, Success>> toggleTask(String id, DateTime date) async {
     try {
       await dataSource.toggleTask(id, date);
+      return Right(Success());
+    } catch (e) {
+      return Left(LocalDataSourceFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Habit>> getHabit(String id) async {
+    try {
+      final habit = await dataSource.getHabit(id);
+      return Right(habit.toEntity());
+    } catch (e) {
+      return Left(LocalDataSourceFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, HabitMonthSummary>> getMonthSummary(
+    String id,
+    DateTime date,
+  ) async {
+    try {
+      final result = await dataSource.getMonthSummary(id, date);
+      return Right(result.toEntity());
+    } catch (e) {
+      return Left(LocalDataSourceFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Success>> updateHabit(String id, String title) async {
+    try {
+      await dataSource.updateHabit(id, title);
       return Right(Success());
     } catch (e) {
       return Left(LocalDataSourceFailure(e.toString()));

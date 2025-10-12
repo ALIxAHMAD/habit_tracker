@@ -10,5 +10,8 @@ class AppRouter extends RootStackRouter {
       page: HomeRoute.page,
       initial: true,
     ),
+    AutoRoute(
+      page: HabitRoute.page,
+    ),
   ];
 }

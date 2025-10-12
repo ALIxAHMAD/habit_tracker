@@ -9,7 +9,10 @@ A lightweight, distraction-free app to track daily habits and visualize progress
   Immediate visual feedback on daily habit completion, boosting motivation.  
 
 - **Scrollable Date Picker**  
-  Quick navigation to past and upcoming dates for easy review and planning.  
+  Quick navigation to past and upcoming dates for easy review and planning.
+  
+- **Habit Page**  
+  Separate page for each habit with editing and a monthly overview of completion.  
 
 - **Smooth Animations**  
   Subtle animations for natural, modern transitions without clutter.  
@@ -42,10 +45,10 @@ A lightweight, distraction-free app to track daily habits and visualize progress
 
 ## 4. Future Improvements
 - Habit reminders and notifications.  
-- Separate page for each habit with editing and a monthly overview of completion.  
 - Mobile home screen widget to quickly view habits and tasks.  
 - Custom color and icon support for each habit.
 ---
 
 ## 5. Demo
-![Screencast](assets/screencast/screencast.gif)
+<video src="assets/screencast/screencast_2.mp4" controls width="300"></video>
+

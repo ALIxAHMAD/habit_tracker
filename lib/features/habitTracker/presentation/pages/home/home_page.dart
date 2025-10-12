@@ -49,7 +49,7 @@ class HomePage extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Habit racker"),
+        title: Text("Habit Tracker"),
       ),
       floatingActionButton: Material(
         borderRadius: BorderRadius.circular(25),
