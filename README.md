@@ -50,5 +50,6 @@ A lightweight, distraction-free app to track daily habits and visualize progress
 ---
 
 ## 5. Demo
-<video src="assets/screencast/screencast_2.mp4" controls width="300"></video>
+https://github.com/user-attachments/assets/8c7081d6-420a-4a8c-9a42-77d783c0cdb2
+
 
